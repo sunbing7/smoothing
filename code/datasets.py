@@ -33,6 +33,36 @@ def get_dataset(dataset: str, split: str, data_file='../data/cifar/cifar.h5') ->
         data = CustomGTSRBAttackDataSet(data_file, is_train=0, t_attack='clean', mode='clean',
                                         target_class=0, transform=transform_test, portion='all')
         return data
+    elif dataset == "fmnist":
+        transform_test = transforms.Compose([
+            transforms.ToTensor(),
+        ])
+        data = CustomFMNISTAttackDataSet(data_file, is_train=0, t_attack='clean', mode='clean',
+                                        target_class=0, transform=transform_test, portion='all')
+        return data
+    elif dataset == "mnistm":
+        transform_test = transforms.Compose([
+            transforms.ToTensor(),
+        ])
+        data = CustomMNISTMAttackDataSet(data_file, is_train=0, t_attack='clean', mode='clean',
+                                        target_class=0, transform=transform_test, portion='all')
+        return data
+    elif dataset == "asl":
+        transform_test = transforms.Compose([
+            transforms.ToTensor(),
+        ])
+        data = datasets.ImageFolder(root=data_file + '/test', transform=transform_test)
+
+        return data
+    elif dataset == "caltech":
+        transform_test = transforms.Compose([
+            transforms.Resize(size=256),
+            transforms.CenterCrop(size=224),
+            transforms.ToTensor(),
+            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+        ])
+        data = datasets.ImageFolder(root=data_file + '/test', transform=transform_test)
+        return data
     else:
         print('Unsupported dataset!')
 
