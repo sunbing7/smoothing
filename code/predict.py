@@ -25,6 +25,7 @@ parser.add_argument('--data_path', type=str, default='../data', help='path to th
 parser.add_argument('--arch', type=str, default='resnet18',
                     choices=['resnet18', 'resnet50', 'MobileNetV2', 'vgg11_bn',
                              'MobileNet', 'shufflenetv2', 'densenet'])
+parser.add_argument("--test_original", type=int, default=0)
 args = parser.parse_args()
 
 
@@ -65,15 +66,17 @@ if __name__ == "__main__":
 
         # make the prediction
         prediction = smoothed_classifier.predict(x, args.N, args.alpha, args.batch)
-        input = x[None,:]
-        ori_predict = base_classifier(input).data.max(1)[1]
+        if args.test_original:
+            input = x[None,:]
+            ori_predict = base_classifier(input).data.max(1)[1]
 
         after_time = time()
         correct = int(prediction == label)
         if correct:
             n_correct = n_correct + 1
-        if ori_predict == label:
-            n_ori_correct = n_ori_correct + 1
+        if args.test_original:
+            if ori_predict == label:
+                n_ori_correct = n_ori_correct + 1
 
         time_elapsed = str(datetime.timedelta(seconds=(after_time - before_time)))
 
@@ -81,5 +84,6 @@ if __name__ == "__main__":
         print("{}\t{}\t{}\t{}\t{}".format(i, label, prediction, correct, time_elapsed), file=f, flush=True)
         n_total = n_total + 1
     print('accuracy:{}'.format(n_correct / n_total))
-    print('original accuracy:{}'.format(n_ori_correct / n_total))
+    if args.test_original:
+        print('original accuracy:{}'.format(n_ori_correct / n_total))
     f.close()
