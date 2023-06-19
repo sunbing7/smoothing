@@ -25,7 +25,7 @@ def get_dataset(dataset, split, data_file='../data/cifar/cifar.h5', t_attack='gr
         ])
         data = CustomCifarAttackDataSet(data_file, is_train=0, t_attack=t_attack, mode='clean',
                                         target_class=0, transform=transform_test, portion='all')
-        data_adv = CustomCifarAttackDataSet(data_file, is_train=0, t_attack=t_attack, mode='clean',
+        data_adv = CustomCifarAttackDataSet(data_file, is_train=0, t_attack=t_attack, mode='adv',
                                         target_class=target_class, transform=transform_test, portion='all')
         return data, data_adv
     elif dataset == "gtsrb":
@@ -34,7 +34,7 @@ def get_dataset(dataset, split, data_file='../data/cifar/cifar.h5', t_attack='gr
         ])
         data = CustomGTSRBAttackDataSet(data_file, is_train=0, t_attack=t_attack, mode='clean',
                                         target_class=0, transform=transform_test, portion='all')
-        data_adv = CustomGTSRBAttackDataSet(data_file, is_train=0, t_attack=t_attack, mode='clean',
+        data_adv = CustomGTSRBAttackDataSet(data_file, is_train=0, t_attack=t_attack, mode='adv',
                                         target_class=target_class, transform=transform_test, portion='all')
         return data, data_adv
     elif dataset == "fmnist":
@@ -52,7 +52,7 @@ def get_dataset(dataset, split, data_file='../data/cifar/cifar.h5', t_attack='gr
         ])
         data = CustomMNISTMAttackDataSet(data_file, is_train=0, t_attack=t_attack, mode='clean',
                                         target_class=0, transform=transform_test, portion='all')
-        data_adv = CustomMNISTMAttackDataSet(data_file, is_train=0, t_attack=t_attack, mode='clean',
+        data_adv = CustomMNISTMAttackDataSet(data_file, is_train=0, t_attack=t_attack, mode='adv',
                                         target_class=target_class, transform=transform_test, portion='all')
         return data, data_adv
     elif dataset == "asl":
