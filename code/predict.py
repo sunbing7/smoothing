@@ -50,6 +50,7 @@ if __name__ == "__main__":
     n_total = 0
     n_correct = 0
     n_ori_correct = 0
+    base_classifier.eval()
     for i in range(len(dataset)):
 
         # only certify every args.skip examples, and stop after args.max examples
@@ -64,7 +65,8 @@ if __name__ == "__main__":
 
         # make the prediction
         prediction = smoothed_classifier.predict(x, args.N, args.alpha, args.batch)
-        ori_predict = base_classifier(x).data.max(1)[1]
+        input = x[None,:]
+        ori_predict = base_classifier(input).data.max(1)[1]
 
         after_time = time()
         correct = int(prediction == label)
