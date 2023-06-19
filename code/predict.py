@@ -47,6 +47,9 @@ if __name__ == "__main__":
 
     # iterate through the dataset
     dataset = get_dataset(args.dataset, args.split, args.data_path)
+    n_total = 0
+    n_correct = 0
+    n_ori_correct = 0
     for i in range(len(dataset)):
 
         # only certify every args.skip examples, and stop after args.max examples
@@ -61,13 +64,20 @@ if __name__ == "__main__":
 
         # make the prediction
         prediction = smoothed_classifier.predict(x, args.N, args.alpha, args.batch)
+        ori_predict = base_classifier(x).data.max(1)[1]
 
         after_time = time()
         correct = int(prediction == label)
+        if correct:
+            n_correct = n_correct + 1
+        if ori_predict == label:
+            n_ori_correct = n_ori_correct + 1
 
         time_elapsed = str(datetime.timedelta(seconds=(after_time - before_time)))
 
         # log the prediction and whether it was correct
         print("{}\t{}\t{}\t{}\t{}".format(i, label, prediction, correct, time_elapsed), file=f, flush=True)
-
+        n_total = n_total + 1
+    print('accuracy:{}'.format(n_correct / n_total))
+    print('original accuracy:{}'.format(n_ori_correct / n_total))
     f.close()
