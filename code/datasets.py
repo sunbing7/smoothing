@@ -14,7 +14,7 @@ IMAGENET_LOC_ENV = "IMAGENET_DIR"
 DATASETS = ["imagenet", "cifar10"]
 
 
-def get_dataset(dataset: str, split: str, data_file='../data/cifar/cifar.h5') -> Dataset:
+def get_dataset(dataset, split, data_file='../data/cifar/cifar.h5', t_attack='green', target_class=0):
     """Return the dataset as a PyTorch Dataset object"""
     if dataset == "imagenet":
         return _imagenet(split)
@@ -23,37 +23,46 @@ def get_dataset(dataset: str, split: str, data_file='../data/cifar/cifar.h5') ->
             transforms.ToTensor(),
             transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
         ])
-        data = CustomCifarAttackDataSet(data_file, is_train=0, t_attack='clean', mode='clean',
+        data = CustomCifarAttackDataSet(data_file, is_train=0, t_attack=t_attack, mode='clean',
                                         target_class=0, transform=transform_test, portion='all')
-        return data
+        data_adv = CustomCifarAttackDataSet(data_file, is_train=0, t_attack=t_attack, mode='clean',
+                                        target_class=target_class, transform=transform_test, portion='all')
+        return data, data_adv
     elif dataset == "gtsrb":
         transform_test = transforms.Compose([
             transforms.ToTensor(),
         ])
-        data = CustomGTSRBAttackDataSet(data_file, is_train=0, t_attack='clean', mode='clean',
+        data = CustomGTSRBAttackDataSet(data_file, is_train=0, t_attack=t_attack, mode='clean',
                                         target_class=0, transform=transform_test, portion='all')
-        return data
+        data_adv = CustomGTSRBAttackDataSet(data_file, is_train=0, t_attack=t_attack, mode='clean',
+                                        target_class=target_class, transform=transform_test, portion='all')
+        return data, data_adv
     elif dataset == "fmnist":
         transform_test = transforms.Compose([
             transforms.ToTensor(),
         ])
-        data = CustomFMNISTAttackDataSet(data_file, is_train=0, t_attack='clean', mode='clean',
+        data = CustomFMNISTAttackDataSet(data_file, is_train=0, t_attack=t_attack, mode='clean',
                                         target_class=0, transform=transform_test, portion='all')
-        return data
+        data_adv = CustomFMNISTAttackDataSet(data_file, is_train=0, t_attack=t_attack, mode='clean',
+                                        target_class=target_class, transform=transform_test, portion='all')
+        return data, data_adv
     elif dataset == "mnistm":
         transform_test = transforms.Compose([
             transforms.ToTensor(),
         ])
-        data = CustomMNISTMAttackDataSet(data_file, is_train=0, t_attack='clean', mode='clean',
+        data = CustomMNISTMAttackDataSet(data_file, is_train=0, t_attack=t_attack, mode='clean',
                                         target_class=0, transform=transform_test, portion='all')
-        return data
+        data_adv = CustomMNISTMAttackDataSet(data_file, is_train=0, t_attack=t_attack, mode='clean',
+                                        target_class=target_class, transform=transform_test, portion='all')
+        return data, data_adv
     elif dataset == "asl":
         transform_test = transforms.Compose([
             transforms.ToTensor(),
         ])
         data = datasets.ImageFolder(root=data_file + '/test', transform=transform_test)
-
-        return data
+        data_adv = CustomASLAttackDataSet(data_file, is_train=0, t_attack=t_attack, mode='adv',
+                                          target_class=target_class, transform=transform_test, portion='all')
+        return data, data_adv
     elif dataset == "caltech":
         transform_test = transforms.Compose([
             transforms.Resize(size=256),
@@ -62,7 +71,9 @@ def get_dataset(dataset: str, split: str, data_file='../data/cifar/cifar.h5') ->
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
         ])
         data = datasets.ImageFolder(root=data_file + '/test', transform=transform_test)
-        return data
+        data_adv = CustomCALTECHAttackDataSet(data_file, is_train=0, t_attack=t_attack, mode='adv',
+                                          target_class=target_class, transform=transform_test, portion='all')
+        return data, data_adv
     else:
         print('Unsupported dataset!')
 

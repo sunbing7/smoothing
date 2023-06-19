@@ -25,6 +25,8 @@ parser.add_argument('--data_path', type=str, default='../data', help='path to th
 parser.add_argument('--arch', type=str, default='resnet18',
                     choices=['resnet18', 'resnet50', 'MobileNetV2', 'vgg11_bn',
                              'MobileNet', 'shufflenetv2', 'densenet'])
+parser.add_argument('--t_attack', type=str, default='green', help='attacked type')
+parser.add_argument('--poison_target', type=int, default=0, help='target class of backdoor attack')
 parser.add_argument("--test_original", type=int, default=0)
 args = parser.parse_args()
 
@@ -33,6 +35,7 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print(device)
 
 if __name__ == "__main__":
+    start_time = time()
     # load the base classifier
     checkpoint = torch.load(args.base_classifier, map_location=device)
     num_class = get_num_classes(args.dataset)
@@ -47,7 +50,9 @@ if __name__ == "__main__":
     print("idx\tlabel\tpredict\tcorrect\ttime", file=f, flush=True)
 
     # iterate through the dataset
-    dataset = get_dataset(args.dataset, args.split, args.data_path)
+    dataset, dataset_adv = get_dataset(args.dataset, args.split, args.data_path, args.t_attack, args.poison_target)
+
+    #test clean samples
     n_total = 0
     n_correct = 0
     n_ori_correct = 0
@@ -86,4 +91,32 @@ if __name__ == "__main__":
     print('accuracy:{}'.format(n_correct / n_total))
     if args.test_original:
         print('original accuracy:{}'.format(n_ori_correct / n_total))
+
+    #test attacked samples
+    n_total = 0
+    n_correct = 0
+    n_ori_correct = 0
+    base_classifier.eval()
+    for i in range(len(dataset_adv)):
+        (x, label) = dataset[i]
+        x = x.cuda()
+        # make the prediction
+        prediction = smoothed_classifier.predict(x, args.N, args.alpha, args.batch)
+        if args.test_original:
+            input = x[None,:]
+            ori_predict = base_classifier(input).data.max(1)[1]
+
+        after_time = time()
+        correct = int(prediction == label)
+        if correct:
+            n_correct = n_correct + 1
+        if args.test_original:
+            if ori_predict == label:
+                n_ori_correct = n_ori_correct + 1
+        n_total = n_total + 1
+    print('SR: {}'.format(n_correct / n_total))
+    if args.test_original:
+        print('original SR:{}'.format(n_ori_correct / n_total))
     f.close()
+    execution_time = time() - start_time
+    print('Running time: {}s'.format(execution_time))
