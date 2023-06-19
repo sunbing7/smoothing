@@ -3,6 +3,7 @@ from typing import *
 import torch
 import os
 from torch.utils.data import Dataset
+from data_loader import *
 
 # set this environment variable to the location of your imagenet directory if you want to read ImageNet data.
 # make sure your val directory is preprocessed to look like the train directory, e.g. by running this script
@@ -13,13 +14,27 @@ IMAGENET_LOC_ENV = "IMAGENET_DIR"
 DATASETS = ["imagenet", "cifar10"]
 
 
-def get_dataset(dataset: str, split: str) -> Dataset:
+def get_dataset(dataset: str, split: str, data_file='../data/cifar/cifar.h5') -> Dataset:
     """Return the dataset as a PyTorch Dataset object"""
     if dataset == "imagenet":
         return _imagenet(split)
     elif dataset == "cifar10":
-        return _cifar10(split)
-
+        transform_test = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+        ])
+        data = CustomCifarAttackDataSet(data_file, is_train=0, t_attack='clean', mode='clean',
+                                        target_class=0, transform=transform_test, portion='all')
+        return data
+    elif dataset == "gtsrb":
+        transform_test = transforms.Compose([
+            transforms.ToTensor(),
+        ])
+        data = CustomGTSRBAttackDataSet(data_file, is_train=0, t_attack='clean', mode='clean',
+                                        target_class=0, transform=transform_test, portion='all')
+        return data
+    else:
+        print('Unsupported dataset!')
 
 def get_num_classes(dataset: str):
     """Return the number of classes in the dataset. """
@@ -27,6 +42,17 @@ def get_num_classes(dataset: str):
         return 1000
     elif dataset == "cifar10":
         return 10
+    elif dataset == "fmnist":
+        return 10
+    elif dataset == "mnistm":
+        return 10
+    elif dataset == "gtsrb":
+        return 43
+    elif dataset == "asl":
+        return 29
+    elif dataset == "caltech":
+        return 101
+
 
 
 def get_normalize_layer(dataset: str) -> torch.nn.Module:

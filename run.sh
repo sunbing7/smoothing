@@ -1,0 +1,1 @@
+python predict.py --dataset=cifar10 --base_classifier=../model_files/model_semtrain_resnet18_CIFAR10_green_last.th --arch=resnet18 --sigma=0.5 --outfile=results.txt --data_path=../data/cifar/cifar_dataset.h5  --batch=64 --split=test --N=1000 --skip=100
