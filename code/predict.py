@@ -120,4 +120,4 @@ if __name__ == "__main__":
         print('original SR:{}'.format(n_ori_correct / n_total))
     f.close()
     execution_time = time() - start_time
-    print('Running time: {}s'.format(execution_time))
+    print('{} Running time: {}s'.format(args.base_classifier, execution_time))
