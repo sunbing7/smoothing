@@ -35,7 +35,7 @@ if __name__ == "__main__":
     # load the base classifier
     checkpoint = torch.load(args.base_classifier, map_location=device)
     num_class = get_num_classes(args.dataset)
-    base_classifier = getattr(models, args.arch)(num_classes=num_class, pretrained=0)
+    base_classifier = getattr(models, args.arch)(num_classes=num_class, pretrained=0).to(device)
     base_classifier.load_state_dict(checkpoint)
 
     # create the smoothed classifier g
