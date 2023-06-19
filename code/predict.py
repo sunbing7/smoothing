@@ -57,8 +57,8 @@ if __name__ == "__main__":
     n_correct = 0
     n_ori_correct = 0
     base_classifier.eval()
+    print('total number of clean samples: {}'.format(len(dataset)))
     for i in range(len(dataset)):
-
         # only certify every args.skip examples, and stop after args.max examples
         if i % args.skip != 0:
             continue
@@ -97,8 +97,9 @@ if __name__ == "__main__":
     n_correct = 0
     n_ori_correct = 0
     base_classifier.eval()
-    for i in range(len(dataset_adv)):
-        (x, label) = dataset[i]
+    print('total number of attacked samples: {}'.format(len(dataset_adv)))
+    for i in range(0, len(dataset_adv)):
+        (x, label) = dataset_adv[i]
         x = x.cuda()
         # make the prediction
         prediction = smoothed_classifier.predict(x, args.N, args.alpha, args.batch)
